@@ -3,7 +3,6 @@ package com.example.product.CustomErrorHandler;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -20,35 +19,43 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
-
-    @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String error = "the request method used is wrong";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String error = "Activity timeout, sorry";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String error = "Failed due to bad format of JSON body submitted.";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
-    }
-
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-        String error = "Failed due to internal exception.";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
-    }
-
     @ExceptionHandler(NotFound.class)
-    protected ResponseEntity<Object> NotFoundException(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getMessage(), ex.getLocalizedMessage()));
+    protected ResponseEntity<Object> NotFoundException(NotFound ex, WebRequest request) {
+       // return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST,
+         LocalDateTime.now(), ex.getMessage(), ex.getLocalizedMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String error = "the request method used is wrong";
+        return buildResponseEntity(
+                new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String error = "Activity timeout, sorry";
+        return buildResponseEntity(
+                new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String error = "Failed due to bad format of JSON body submitted.";
+        return buildResponseEntity(
+                new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+            HttpStatusCode statusCode, WebRequest request) {
+        String error = "Failed due to internal exception.";
+        return buildResponseEntity(
+                new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

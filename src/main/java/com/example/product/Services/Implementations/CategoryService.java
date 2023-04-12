@@ -46,7 +46,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryResponse getCategory(Long id) {
        Optional<Category> category = categoryDao.findById(id);
-        if(!category.isPresent()) throw new NotFound("No Category was found");;
+        if(!category.isPresent()) throw new NotFound("No Category was found " +id);;
         CategoryResponse response = new CategoryResponse(category.get().getId(),category.get().getName());
         return response; 
     }

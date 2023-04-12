@@ -56,7 +56,7 @@ public class ProductService implements IProductService {
     public ProductResponse fetchProductById(Long id) {
         Optional<Product> product = productDao.findById(id);
         if (!product.isPresent())
-            throw new NotFound("No Product was found");
+            throw new NotFound("No Product was found " +id);
         // response
         return new ProductResponse(product.get().getId(), product.get().getName(), product.get().getPrice(),
                 product.get().getProductInfo(), product.get().getDescription());
