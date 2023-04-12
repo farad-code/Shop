@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.product.CustomErrorHandler.NotFound;
 import com.example.product.Dto.Product.CreateProductRequest;
 import com.example.product.Dto.Product.ProductResponse;
 import com.example.product.Dto.Product.UpdateProductRequest;
@@ -25,13 +26,16 @@ public class ProductService implements IProductService {
 
     private final ProductDao productDao;
     private final CategoryDao categoryDao;
+
     @Override
     public ProductResponse createProduct(CreateProductRequest request) {
-       Optional<Category> category = categoryDao.findById(request.categoryId());
-       if (!category.isPresent()) return null;
-       Category existingCategory = category.get();
+        Optional<Category> category = categoryDao.findById(request.categoryId());
+        if (!category.isPresent())
+            throw new NotFound("No Category was found");
+        ;
+        Category existingCategory = category.get();
         Product product = new Product(request.productName(), request.price(), request.productAvailabilityInfo(),
-                request.description(),existingCategory);
+                request.description(), existingCategory);
         Product newProduct = productDao.save(product);
         // response
         return new ProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getPrice(),
@@ -51,6 +55,8 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse fetchProductById(Long id) {
         Optional<Product> product = productDao.findById(id);
+        if (!product.isPresent())
+            throw new NotFound("No Product was found");
         // response
         return new ProductResponse(product.get().getId(), product.get().getName(), product.get().getPrice(),
                 product.get().getProductInfo(), product.get().getDescription());
@@ -60,7 +66,7 @@ public class ProductService implements IProductService {
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
         Optional<Product> product = productDao.findById(id);
         if (!product.isPresent())
-            return null;
+            throw new NotFound("No Product was found");
         Product existingProduct = product.get();
         existingProduct.setName(request.productName());
         existingProduct.setPrice(request.price());
@@ -76,7 +82,7 @@ public class ProductService implements IProductService {
     public boolean deleteProduct(Long id) {
         Optional<Product> product = productDao.findById(id);
         if (!product.isPresent())
-            return false;
+            throw new NotFound("No Product was found");
         productDao.deleteById(id);
         return true;
     }

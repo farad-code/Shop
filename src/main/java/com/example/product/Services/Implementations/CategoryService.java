@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.product.CustomErrorHandler.NotFound;
 import com.example.product.Dto.Category.CategoryRequest;
 import com.example.product.Dto.Category.CategoryResponse;
 import com.example.product.Dto.Category.SearchByNameRequest;
@@ -45,7 +46,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public CategoryResponse getCategory(Long id) {
        Optional<Category> category = categoryDao.findById(id);
-        if(!category.isPresent()) return null;
+        if(!category.isPresent()) throw new NotFound("No Category was found");;
         CategoryResponse response = new CategoryResponse(category.get().getId(),category.get().getName());
         return response; 
     }
@@ -57,7 +58,7 @@ public class CategoryService implements ICategoryService {
             categoryDao.deleteById(id);
             return true;
         }
-        return false;
+        throw new NotFound("No Category was found");
     }
 
     @Override
@@ -71,7 +72,7 @@ public class CategoryService implements ICategoryService {
             CategoryResponse response = new CategoryResponse(existingCategory.getId(),existingCategory.getName());
             return response;
         }
-       return null;
+       throw new NotFound("No Category was found");
     }
 
     @Override
