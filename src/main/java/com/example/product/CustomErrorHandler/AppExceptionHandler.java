@@ -1,9 +1,9 @@
 package com.example.product.CustomErrorHandler;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
@@ -43,6 +44,11 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
         String error = "Failed due to internal exception.";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), error, ex.getLocalizedMessage()));
+    }
+
+    @ExceptionHandler(NotFound.class)
+    protected ResponseEntity<Object> NotFoundException(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, LocalDateTime.now(), ex.getMessage(), ex.getLocalizedMessage()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
