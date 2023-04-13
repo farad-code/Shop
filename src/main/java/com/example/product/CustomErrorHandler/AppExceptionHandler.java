@@ -1,7 +1,6 @@
 package com.example.product.CustomErrorHandler;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

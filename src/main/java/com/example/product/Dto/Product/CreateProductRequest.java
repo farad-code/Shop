@@ -1,5 +1,9 @@
 package com.example.product.Dto.Product;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.product.Enumerations.ProductInfo;
 
 import jakarta.validation.constraints.NotBlank;
@@ -10,5 +14,7 @@ public record CreateProductRequest(
     @NotNull double price,
     ProductInfo productAvailabilityInfo,
     String description,
-    Long categoryId
+    Long categoryId,
+    List<MultipartFile> productImage
+    
 ) {}

@@ -1,22 +1,29 @@
 package com.example.product.Services.Implementations;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cloudinary.Cloudinary;
 import com.example.product.CustomErrorHandler.NotFound;
 import com.example.product.Dto.Product.CreateProductRequest;
+import com.example.product.Dto.Product.CreateProductResponse;
 import com.example.product.Dto.Product.ProductResponse;
 import com.example.product.Dto.Product.UpdateProductRequest;
 import com.example.product.Entities.Category;
 import com.example.product.Entities.Product;
+import com.example.product.Entities.ProductImage;
 import com.example.product.Repositories.CategoryDao;
 import com.example.product.Repositories.ProductDao;
 import com.example.product.Repositories.ProductImageDao;
 import com.example.product.Services.IProductService;
+import com.example.product.Utils.UploadImage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,20 +35,30 @@ public class ProductServiceImpl implements IProductService {
     private final ProductDao productDao;
     private final CategoryDao categoryDao;
     private final ProductImageDao productImageDao;
+    private final Cloudinary cloudinary;
 
     @Override
-    public ProductResponse createProduct(CreateProductRequest request) {
+    public CreateProductResponse createProduct(CreateProductRequest request) throws IOException {
+      
+
         Optional<Category> category = categoryDao.findById(request.categoryId());
         if (category.isEmpty())
-            throw new NotFound("No Category was found");
+            throw new NotFound("No Category was found for categoryId " + request.categoryId());
         
         Category existingCategory = category.get();
         Product product = new Product(request.productName(), request.price(), request.productAvailabilityInfo(),
                 request.description(), existingCategory);
         Product newProduct = productDao.save(product);
+        UploadImage uploadImage = new UploadImage(cloudinary);
+        List<ProductImage> uploads =uploadImage.multiUploadProductImage(request.productImage(),newProduct);
+        // Save Images to ProductImage table
+        productImageDao.saveAll(uploads);
+        List<String> productImagurl = uploads.stream()
+        .map(image->image.getImageUrl())
+        .collect(Collectors.toList());
         // response
-        return new ProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getPrice(),
-                newProduct.getProductInfo(), newProduct.getDescription());
+        return new CreateProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getPrice(),
+                newProduct.getProductInfo(), newProduct.getDescription(),productImagurl);
     }
 
     @Override

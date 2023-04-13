@@ -24,7 +24,7 @@ public class ProductImage {
     @ManyToOne
     private Product product;
 
-    ProductImage(String imageUrl, String imageId, Product product) {
+    public ProductImage(String imageUrl, String imageId, Product product) {
         this.product = product;
         this.imageUrl = imageUrl;
         this.imageId = imageId;
