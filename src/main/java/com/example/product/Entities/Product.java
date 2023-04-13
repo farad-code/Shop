@@ -3,6 +3,7 @@ package com.example.product.Entities;
 import java.util.List;
 
 import com.example.product.Enumerations.ProductInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +41,7 @@ public class Product {
     @ManyToOne
     private Category category;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private List<ProductImage> productImages;
 

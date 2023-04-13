@@ -21,6 +21,7 @@ import com.example.product.Dto.Product.CreateProductRequest;
 import com.example.product.Dto.Product.CreateProductResponse;
 import com.example.product.Dto.Product.ProductResponse;
 import com.example.product.Dto.Product.UpdateProductRequest;
+import com.example.product.Dto.Product.UpdateProductResponse;
 import com.example.product.Services.Implementations.ProductServiceImpl;
 
 import jakarta.validation.Valid;
@@ -58,8 +59,8 @@ public class ProductController {
     }
 
     @PutMapping("{id}")
-    public ProductResponse updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
-        ProductResponse product = productService.updateProduct(id, request);
+    public UpdateProductResponse updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
+        UpdateProductResponse product = productService.updateProduct(id, request);
         return product;
     }
 }

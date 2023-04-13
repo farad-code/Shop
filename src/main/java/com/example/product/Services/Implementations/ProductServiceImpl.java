@@ -2,9 +2,7 @@ package com.example.product.Services.Implementations;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -16,6 +14,7 @@ import com.example.product.Dto.Product.CreateProductRequest;
 import com.example.product.Dto.Product.CreateProductResponse;
 import com.example.product.Dto.Product.ProductResponse;
 import com.example.product.Dto.Product.UpdateProductRequest;
+import com.example.product.Dto.Product.UpdateProductResponse;
 import com.example.product.Entities.Category;
 import com.example.product.Entities.Product;
 import com.example.product.Entities.ProductImage;
@@ -39,26 +38,25 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public CreateProductResponse createProduct(CreateProductRequest request) throws IOException {
-      
 
         Optional<Category> category = categoryDao.findById(request.categoryId());
         if (category.isEmpty())
             throw new NotFound("No Category was found for categoryId " + request.categoryId());
-        
+
         Category existingCategory = category.get();
         Product product = new Product(request.productName(), request.price(), request.productAvailabilityInfo(),
                 request.description(), existingCategory);
         Product newProduct = productDao.save(product);
         UploadImage uploadImage = new UploadImage(cloudinary);
-        List<ProductImage> uploads =uploadImage.multiUploadProductImage(request.productImage(),newProduct);
+        List<ProductImage> uploads = uploadImage.multiUploadProductImage(request.productImage(), newProduct);
         // Save Images to ProductImage table
         productImageDao.saveAll(uploads);
         List<String> productImagurl = uploads.stream()
-        .map(image->image.getImageUrl())
-        .collect(Collectors.toList());
+                .map(image -> image.getImageUrl())
+                .collect(Collectors.toList());
         // response
         return new CreateProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getPrice(),
-                newProduct.getProductInfo(), newProduct.getDescription(),productImagurl);
+                newProduct.getProductInfo(), newProduct.getDescription(), productImagurl);
     }
 
     @Override
@@ -66,7 +64,8 @@ public class ProductServiceImpl implements IProductService {
         List<ProductResponse> products = productDao.findAll()
                 .stream()
                 .map(product -> new ProductResponse(product.getId(), product.getName(), product.getPrice(),
-                        product.getProductInfo(), product.getDescription()))
+                        product.getProductInfo(), product.getDescription(),
+                        product.getProductImages()))
                 .collect(Collectors.toList());
         return products;
     }
@@ -75,14 +74,14 @@ public class ProductServiceImpl implements IProductService {
     public ProductResponse fetchProductById(Long id) {
         Optional<Product> product = productDao.findById(id);
         if (product.isEmpty())
-            throw new NotFound("No Product was found " +id);
+            throw new NotFound("No Product was found " + id);
         // response
         return new ProductResponse(product.get().getId(), product.get().getName(), product.get().getPrice(),
-                product.get().getProductInfo(), product.get().getDescription());
+                product.get().getProductInfo(), product.get().getDescription(), product.get().getProductImages());
     }
 
     @Override
-    public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
+    public UpdateProductResponse updateProduct(Long id, UpdateProductRequest request) {
         Optional<Product> product = productDao.findById(id);
         if (product.isEmpty())
             throw new NotFound("No Product was found");
@@ -93,7 +92,7 @@ public class ProductServiceImpl implements IProductService {
         existingProduct.setDescription(request.description());
         productDao.save(existingProduct);
         // response
-        return new ProductResponse(existingProduct.getId(), existingProduct.getName(), existingProduct.getPrice(),
+        return new UpdateProductResponse(existingProduct.getId(), existingProduct.getName(), existingProduct.getPrice(),
                 existingProduct.getProductInfo(), existingProduct.getDescription());
     }
 
