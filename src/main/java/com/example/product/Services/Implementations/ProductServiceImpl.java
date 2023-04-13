@@ -15,6 +15,7 @@ import com.example.product.Entities.Category;
 import com.example.product.Entities.Product;
 import com.example.product.Repositories.CategoryDao;
 import com.example.product.Repositories.ProductDao;
+import com.example.product.Repositories.ProductImageDao;
 import com.example.product.Services.IProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,17 +23,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class ProductService implements IProductService {
+public class ProductServiceImpl implements IProductService {
 
     private final ProductDao productDao;
     private final CategoryDao categoryDao;
+    private final ProductImageDao productImageDao;
 
     @Override
     public ProductResponse createProduct(CreateProductRequest request) {
         Optional<Category> category = categoryDao.findById(request.categoryId());
-        if (!category.isPresent())
+        if (category.isEmpty())
             throw new NotFound("No Category was found");
-        ;
+        
         Category existingCategory = category.get();
         Product product = new Product(request.productName(), request.price(), request.productAvailabilityInfo(),
                 request.description(), existingCategory);
@@ -55,7 +57,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse fetchProductById(Long id) {
         Optional<Product> product = productDao.findById(id);
-        if (!product.isPresent())
+        if (product.isEmpty())
             throw new NotFound("No Product was found " +id);
         // response
         return new ProductResponse(product.get().getId(), product.get().getName(), product.get().getPrice(),
@@ -65,7 +67,7 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
         Optional<Product> product = productDao.findById(id);
-        if (!product.isPresent())
+        if (product.isEmpty())
             throw new NotFound("No Product was found");
         Product existingProduct = product.get();
         existingProduct.setName(request.productName());
@@ -81,7 +83,7 @@ public class ProductService implements IProductService {
     @Override
     public boolean deleteProduct(Long id) {
         Optional<Product> product = productDao.findById(id);
-        if (!product.isPresent())
+        if (product.isEmpty())
             throw new NotFound("No Product was found");
         productDao.deleteById(id);
         return true;

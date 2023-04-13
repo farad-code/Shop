@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.product.Dto.Category.CategoryRequest;
 import com.example.product.Dto.Category.CategoryResponse;
 import com.example.product.Dto.Category.SearchByNameRequest;
-import com.example.product.Services.Implementations.CategoryService;
+import com.example.product.Services.Implementations.CategoryServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryServiceImpl categoryService;
 
     @GetMapping
     public List<CategoryResponse> fetchCategories() {

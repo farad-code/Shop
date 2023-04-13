@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.product.Dto.Product.CreateProductRequest;
 import com.example.product.Dto.Product.ProductResponse;
 import com.example.product.Dto.Product.UpdateProductRequest;
-import com.example.product.Services.Implementations.ProductService;
+import com.example.product.Services.Implementations.ProductServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductController {
     
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
     @GetMapping
     public  List<ProductResponse> fetchAllProducts(){
