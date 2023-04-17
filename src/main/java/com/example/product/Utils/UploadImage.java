@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
@@ -17,6 +17,7 @@ import com.example.product.Entities.ProductImage;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Service
 public class UploadImage {
 
   private final Cloudinary cloudinary;
